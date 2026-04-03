@@ -15,7 +15,9 @@ bool isError() {
 isize slen(ZapString s) {
     return s.len;
 }
-
+char sindex(ZapString s, isize idx) {
+    return s.ptr[idx];
+}
 bool streql(ZapString a, ZapString b) {
     if (a.len != b.len) return false;
     if (a.ptr == b.ptr) return true;
