@@ -1,6 +1,6 @@
 ZAPC = zapc
 CC ?= cc
-CFLAGS ?= -Wall
+CFLAGS ?= -Wall -g -Og
 BUILD_DIR = build
 OUT_DIR = out
 TARGET = $(OUT_DIR)/zempl
