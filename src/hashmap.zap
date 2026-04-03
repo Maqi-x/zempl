@@ -43,23 +43,25 @@ fun hmPut(key: String, value: String) Bool {
     }
 
     return false; // table full
-} 
-//
-//bool hashmap_get(HashMap* map, int key, int* out) {
-//    unsigned int idx = hash(key);
-//
-//    for (int i = 0; i < CAPACITY; i++) {
-//        unsigned int probe = (idx + i) % CAPACITY;
-//
-//        if (!map->data[probe].used) {
-//            return false;
-//        }
-//
-//        if (map->data[probe].key == key) {
-//            *out = map->data[probe].value;
-//            return true;
-//        }
-//    }
-//
-//    return false;
-//}
+}
+
+fun hmGet(key: String) String {
+    var idx: UInt64 = hashString(key);
+
+    var i: Int = 0;
+    while i < CAPACITY {
+        var probe: UInt64 = (idx + i) % CAPACITY;
+
+        var isUsed: Bool = hmData[probe].used;
+        if !isUsed {
+            return "";
+        }
+        if streql(hmData[probe].key, key) {
+            return hmData[probe].value;
+        }
+
+        i = i + 1;
+    }
+
+    return "";
+}
