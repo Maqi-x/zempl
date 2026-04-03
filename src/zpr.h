@@ -7,6 +7,7 @@ typedef struct ZapString {
     isize len;
 } ZapString;
 
+isize slen(ZapString s);
 bool streql(ZapString a, ZapString b);
 
 void print(ZapString s);

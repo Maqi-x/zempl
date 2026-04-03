@@ -12,6 +12,10 @@ bool isError() {
     return errorFlag;
 }
 
+isize slen(ZapString s) {
+    return s.len;
+}
+
 bool streql(ZapString a, ZapString b) {
     if (a.len != b.len) return false;
     if (a.ptr == b.ptr) return true;
