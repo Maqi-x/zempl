@@ -19,6 +19,9 @@ ext fun apGetInput() String;
 ext fun apGetOutput() String;
 ext fun apParse() Bool;
 
+// ENV functions declarations
+ext fun envLoad(file: String) Bool;
+
 fun run() Int {
     hmInit();
     apParse();
