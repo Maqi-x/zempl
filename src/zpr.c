@@ -9,7 +9,7 @@
 bool streql(ZapString a, ZapString b) {
     if (a.len != b.len) return false;
     if (a.ptr == b.ptr) return true;
-    return memcmp(a.ptr, b.ptr, b.len);
+    return memcmp(a.ptr, b.ptr, b.len) == 0;
 }
 
 void print(ZapString s) {
