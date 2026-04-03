@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 typedef int isize;
 
 typedef struct ZapString {
