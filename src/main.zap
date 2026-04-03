@@ -7,7 +7,16 @@ ext fun eprint(s: String);
 ext fun getArgCount() Int;
 ext fun getArg(index: Int) String;
 
+// HM functions declarations
+ext fun hmInit();
+ext fun hmPut(key: String, value: String) Bool;
+ext fun hmGet(key: String) String;
+
 fun run() Int {
+    hmInit();
+    hmPut("hello", "world");
+    println(hmGet("hello"));
+
     var i: Int = 0;
     while i < getArgCount() {
         println(getArg(i));

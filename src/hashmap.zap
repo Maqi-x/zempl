@@ -1,3 +1,8 @@
+/// declarations
+/// ext fun hmInit();
+/// ext fun hmPut(key: String, value: String) Bool;
+/// ext fun hmGet(key: String) String;
+
 ext fun hashString(s: String) UInt64;
 ext fun streql(a: String, b: String) Bool; 
 
@@ -9,7 +14,7 @@ struct Entry {
     used: Bool,
 }
 
-global var hmData: [CAPACITY]Entry;
+global var hmData: [256]Entry;
 
 fun hmInit() {
     var i: Int = 0;
@@ -20,7 +25,7 @@ fun hmInit() {
 }
 
 fun hmPut(key: String, value: String) Bool {
-    var idx: UInt64 = hashString(key);
+    var idx: UInt64 = hashString(key) % CAPACITY;
 
     var i: Int = 0;
     while i < CAPACITY {
@@ -46,7 +51,7 @@ fun hmPut(key: String, value: String) Bool {
 }
 
 fun hmGet(key: String) String {
-    var idx: UInt64 = hashString(key);
+    var idx: UInt64 = hashString(key) % CAPACITY;
 
     var i: Int = 0;
     while i < CAPACITY {
