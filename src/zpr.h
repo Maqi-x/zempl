@@ -5,6 +5,8 @@ typedef struct ZapString {
     isize len;
 } ZapString;
 
+bool streql(ZapString a, ZapString b);
+
 void print(ZapString s);
 void eprint(ZapString s);
 

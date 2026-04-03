@@ -4,6 +4,13 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
+
+bool streql(ZapString a, ZapString b) {
+    if (a.len != b.len) return false;
+    if (a.ptr == b.ptr) return true;
+    return memcmp(a.ptr, b.ptr, b.len);
+}
 
 void print(ZapString s) {
     fwrite(s.ptr, s.len, 1, stdout);
