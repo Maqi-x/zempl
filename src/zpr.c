@@ -1,14 +1,9 @@
+#include "zpr.h"
+
 #include <stddef.h>
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
-
-typedef int isize;
-
-typedef struct ZapString {
-    const char* ptr;
-    isize len;
-} ZapString;
 
 void print(ZapString s) {
     fwrite(s.ptr, s.len, 1, stdout);
