@@ -7,6 +7,11 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+bool errorFlag;
+bool isError() {
+    return errorFlag;
+}
+
 bool streql(ZapString a, ZapString b) {
     if (a.len != b.len) return false;
     if (a.ptr == b.ptr) return true;
@@ -29,15 +34,23 @@ void eprintln(ZapString s) {
     putc('\n', stderr);
 }
 
-ZapStringResult readFile(ZapString path) {
+ZapString readFile(ZapString path) {
+    errorFlag = false;
+
     char* cpath = malloc(path.len + 1);
-    if (!cpath) return (ZapStringResult) {0};
+    if (!cpath) {
+        errorFlag = true;
+        return (ZapString) { 0 };
+    }
     memcpy(cpath, path.ptr, (size_t)path.len);
     cpath[path.len] = '\0';
 
     FILE* f = fopen(cpath, "rb");
     free(cpath);
-    if (!f) return (ZapStringResult) { .ok = false };
+    if (!f) {
+        errorFlag = true;
+        return (ZapString) { 0 };
+    }
 
     fseek(f, 0, SEEK_END);
     long size = ftell(f);
@@ -46,7 +59,8 @@ ZapStringResult readFile(ZapString path) {
     char* buf = malloc((size_t)size);
     if (!buf) {
         fclose(f);
-        return (ZapStringResult) { .ok = false };
+        errorFlag = true;
+        return (ZapString) { 0 };
     }
 
     size_t read = fread(buf, 1, (size_t)size, f);
@@ -54,13 +68,11 @@ ZapStringResult readFile(ZapString path) {
 
     if (read != (size_t)size) {
         free(buf);
-        return (ZapStringResult) { .ok = false };
+        errorFlag = true;
+        return (ZapString) { 0 };
     }
 
-    return (ZapStringResult) {
-        .string = { .ptr = buf, .len = (isize)size },
-        .ok = true
-    };
+    return (ZapString) { .ptr = buf, .len = (isize)size };
 }
 
 void freeFileContent(ZapString content) {

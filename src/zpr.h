@@ -7,11 +7,6 @@ typedef struct ZapString {
     isize len;
 } ZapString;
 
-typedef struct ZapStringResult {
-    ZapString string;
-    bool ok;
-} ZapStringResult;
-
 bool streql(ZapString a, ZapString b);
 
 void print(ZapString s);
@@ -22,7 +17,9 @@ void eprintln(ZapString s);
 
 void printInt(int n);
 
-ZapStringResult readFile(ZapString path);
+bool isError();
+
+ZapString readFile(ZapString path);
 void freeFileContent(ZapString content);
 
 isize getArgCount();
