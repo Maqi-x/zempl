@@ -3,11 +3,11 @@
 #include <string.h>
 #include <stdio.h>
 
-typedef long usize;
+typedef int isize;
 
 typedef struct ZapString {
     const char* ptr;
-    usize len;
+    isize len;
 } ZapString;
 
 void print(ZapString s) {
@@ -26,6 +26,10 @@ void eprintln(ZapString s) {
     putc('\n', stderr);
 }
 
+void printInt(int n) {
+    printf("%d\n", n);
+}
+
 typedef struct ZprArgs {
     int count;
     const char* const* arr;
@@ -33,11 +37,11 @@ typedef struct ZprArgs {
 
 static ZprArgs _args;
 
-usize getArgCount() {
+isize getArgCount() {
     return _args.count;
 }
 
-ZapString getArg(usize index) {
+ZapString getArg(isize index) {
     assert(index < _args.count);
     return (ZapString) {
         .ptr = _args.arr[index],
