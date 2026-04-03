@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 bool streql(ZapString a, ZapString b) {
     if (a.len != b.len) return false;
@@ -26,6 +27,44 @@ void println(ZapString s) {
 void eprintln(ZapString s) {
     eprint(s);
     putc('\n', stderr);
+}
+
+ZapStringResult readFile(ZapString path) {
+    char* cpath = malloc(path.len + 1);
+    if (!cpath) return (ZapStringResult) {0};
+    memcpy(cpath, path.ptr, (size_t)path.len);
+    cpath[path.len] = '\0';
+
+    FILE* f = fopen(cpath, "rb");
+    free(cpath);
+    if (!f) return (ZapStringResult) { .ok = false };
+
+    fseek(f, 0, SEEK_END);
+    long size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    char* buf = malloc((size_t)size);
+    if (!buf) {
+        fclose(f);
+        return (ZapStringResult) { .ok = false };
+    }
+
+    size_t read = fread(buf, 1, (size_t)size, f);
+    fclose(f);
+
+    if (read != (size_t)size) {
+        free(buf);
+        return (ZapStringResult) { .ok = false };
+    }
+
+    return (ZapStringResult) {
+        .string = { .ptr = buf, .len = (isize)size },
+        .ok = true
+    };
+}
+
+void freeFileContent(ZapString content) {
+    free((void*)content.ptr);
 }
 
 void printInt(int n) {
