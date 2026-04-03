@@ -18,6 +18,15 @@ isize slen(ZapString s) {
 char sindex(ZapString s, isize idx) {
     return s.ptr[idx];
 }
+ZapString sslice(ZapString s, isize start, isize end) {
+    if (start < 0) start = 0;
+    if (end > s.len) end = s.len;
+    if (start > end) return (ZapString) { .ptr = NULL, .len = 0 };
+    return (ZapString) {
+        .ptr = s.ptr + start,
+        .len = end - start,
+    };
+}
 bool streql(ZapString a, ZapString b) {
     if (a.len != b.len) return false;
     if (a.ptr == b.ptr) return true;

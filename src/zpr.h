@@ -9,6 +9,7 @@ typedef struct ZapString {
 
 isize slen(ZapString s);
 char sindex(ZapString s, isize idx);
+ZapString sslice(ZapString s, isize start, isize end);
 bool streql(ZapString a, ZapString b);
 
 void print(ZapString s);
