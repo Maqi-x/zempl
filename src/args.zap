@@ -109,10 +109,10 @@ fun apParse() Bool {
                 eprintln("Missing value for --on-undef-var");
                 return false;
             }
-            var val: String = getArg(i);
-            if !apParseUndefVarBehavior(val) {
+            var value: String = getArg(i);
+            if !apParseUndefVarBehavior(value) {
                 eprint("Invalid value for --on-undef-var: ");
-                eprintln(val);
+                eprintln(value);
                 return false;
             }
         } else if streql(input, "") {
