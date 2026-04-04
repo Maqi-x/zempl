@@ -14,6 +14,9 @@ ext fun hmInit();
 ext fun hmPut(key: String, value: String) Bool;
 ext fun hmGet(key: String) String;
 
+// ENV functions declarations
+ext fun envLoad(file: String) Bool;
+
 /// AP functions declarations
 /// ext fun apGetInput() String;
 /// ext fun apGetOutput() String;
@@ -47,6 +50,15 @@ fun apParse() Bool {
 
             if (!hmPut(key, value)) {
                 eprintln("Internal error");
+                return false;
+            }
+        } else if streql(arg, "--env") || streql(arg, "-E") {
+            i = i + 1;
+            var filepath: String = getArg(i);
+
+            if !envLoad(filepath) {
+                eprint("Failed to load env file: ");
+                eprintln(filepath);
                 return false;
             }
         } else if streql(input, "") {
