@@ -23,8 +23,18 @@ ext fun envLoad(file: String) Bool;
 /// ext fun apParse() Bool;
 
 // argument parser implementation
+enum UndefinedVarBehavior {
+    Ignore,
+    Warn,
+    Error,
+    Empty,
+}
+
 global var input: String;
 global var output: String;
+global var outputSpecified: Bool;
+
+global var undefVarBehavior: UndefinedVarBehavior;
 
 fun apGetInput() String {
     return input;
@@ -32,8 +42,36 @@ fun apGetInput() String {
 fun apGetOutput() String {
     return output;
 }
+fun apGetUndefinedVarBehavior() UndefinedVarBehavior {
+    return undefVarBehavior;
+}
+
+fun apParseUndefVarBehavior(s: String) Bool {
+    if streql(s, "ignore") {
+        undefVarBehavior = UndefinedVarBehavior.Ignore;
+        return true;
+    } else if streql(s, "warn") {
+        undefVarBehavior = UndefinedVarBehavior.Warn;
+        return true;
+    } else if streql(s, "error") {
+        undefVarBehavior = UndefinedVarBehavior.Error;
+        return true;
+    } else if streql(s, "empty") {
+        undefVarBehavior = UndefinedVarBehavior.Empty;
+        return true;
+    }
+    return false;
+}
+
+fun apApplyDefaults() {
+    input = "";
+    output = "-";
+    outputSpecified = false;
+    undefVarBehavior = UndefinedVarBehavior.Warn;
+}
 
 fun apParse() Bool {
+    apApplyDefaults();
     var i: Int = 1;
     while i < getArgCount() {
         var arg: String = getArg(i);
@@ -54,6 +92,10 @@ fun apParse() Bool {
             }
         } else if streql(arg, "--env") || streql(arg, "-E") {
             i = i + 1;
+            if !(i < getArgCount()) {
+                eprintln("Missing filepath for --env");
+                return false;
+            }
             var filepath: String = getArg(i);
 
             if !envLoad(filepath) {
@@ -61,9 +103,21 @@ fun apParse() Bool {
                 eprintln(filepath);
                 return false;
             }
+        } else if streql(arg, "--on-undef-var") || streql(arg, "-U") {
+            i = i + 1;
+            if !(i < getArgCount()) {
+                eprintln("Missing value for --on-undef-var");
+                return false;
+            }
+            var val: String = getArg(i);
+            if !apParseUndefVarBehavior(val) {
+                eprint("Invalid value for --on-undef-var: ");
+                eprintln(val);
+                return false;
+            }
         } else if streql(input, "") {
             input = arg;
-        } else if streql(output, "") {
+        } else if streql(output, "") || !outputSpecified {
             output = arg;
         } else {
             eprint("Unexpected argument: ");
