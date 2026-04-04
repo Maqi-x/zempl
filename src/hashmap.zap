@@ -29,7 +29,10 @@ fun hmPut(key: String, value: String) Bool {
 
     var i: Int = 0;
     while i < CAPACITY {
-        var probe: UInt64 = (idx + i) % CAPACITY;
+        var probe: UInt64 = idx + i;
+        while (probe >= CAPACITY) {
+            probe = probe - CAPACITY;
+        }
 
         var isUsed: Bool = (hmData[probe].used);
         if !isUsed {
@@ -55,7 +58,10 @@ fun hmGet(key: String) String {
 
     var i: Int = 0;
     while i < CAPACITY {
-        var probe: UInt64 = (idx + i) % CAPACITY;
+        var probe: UInt64 = idx + i;
+        while (probe >= CAPACITY) {
+            probe = probe - CAPACITY;
+        }
 
         var isUsed: Bool = hmData[probe].used;
         if !isUsed {
