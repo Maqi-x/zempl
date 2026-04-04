@@ -10,6 +10,7 @@ ext fun sslice(s: String, start: Int, end: Int) String;
 ext fun streql(a: String, b: String) Bool;
 
 ext fun readFile(path: String) String;
+ext fun readFromStdin() String;
 ext fun freeFileContent(content: String);
 ext fun writeFile(path: String, content: String) Bool;
 
@@ -115,6 +116,21 @@ fun templateEngine(input: String) Bool {
     return true;
 }
 
+fun readInput(file: String) String {
+    var result: String;
+    if streql(file, "-") || slen(file) == 0 {
+        result = readFromStdin();
+    } else {
+        result = readFile(file);
+    }
+
+    if isError() {
+        eprint("failed to read input from ");
+        eprintln(file);
+    }
+    return result;
+}
+
 fun saveOutput(file: String) Bool {
     var content: String = dtbGetString();
     if streql(file, "-") || slen(file) == 0 {
@@ -126,12 +142,18 @@ fun saveOutput(file: String) Bool {
 
 fun run() Int {
     hmInit();
-    apParse();
+    if !apParse() {
+        return 1;
+    }
 
     var inputFile: String = apGetInput();
     var outputFile: String = apGetOutput();
 
-    var inputContent: String = readFile(inputFile);
+    var inputContent: String = readInput(inputFile);
+    if isError() {
+        return 2;
+    }
+
     templateEngine(inputContent);
     freeFileContent(inputContent);
 
