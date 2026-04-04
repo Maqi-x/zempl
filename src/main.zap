@@ -49,7 +49,7 @@ enum TeState {
     Var
 }
 
-fun handleUndefinedVariable() Bool {
+fun handleUndefinedVariable(varName: String) Bool {
     var behavior: UndefinedVarBehavior = apGetUndefinedVarBehavior();
     if behavior == UndefinedVarBehavior.Ignore {
         dtbPushChar('@');
@@ -79,7 +79,7 @@ fun templateEngine(input: String) Bool {
         if state == TeState.Text {
             if c == '@' {
                 // @@ -> @
-                if i + 1 < len && sindex(input, i + 1) == '@' {
+                if i + 1 < slen(input) && sindex(input, i + 1) == '@' {
                     dtbPushChar('@');
                     i = i + 1;
                 } else {
@@ -94,7 +94,7 @@ fun templateEngine(input: String) Bool {
                 var varName: String = sslice(input, varStart, i);
                 var value: String = hmGet(varName);
                 if isError() {
-                    if !handleUndefinedVariable() {
+                    if !handleUndefinedVariable(varName) {
                         return false;
                     }
                 } else {
