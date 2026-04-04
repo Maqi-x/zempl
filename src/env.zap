@@ -28,8 +28,6 @@ ext fun hmGet(key: String) String;
 /// ext fun envLoad(file: String) Bool;
 
 fun envLoad(file: String) Bool {
-    println(file);
-    
     var content: String = readFile(file);
     if isError() {
         return false;
@@ -71,6 +69,7 @@ fun envLoad(file: String) Bool {
         }
     }
 
-    freeFileContent(content);
+    // memory leak is intentional
+    //freeFileContent(content);
     return true;
 }
