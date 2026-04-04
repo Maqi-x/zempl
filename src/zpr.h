@@ -29,3 +29,11 @@ void freeFileContent(ZapString content);
 
 isize getArgCount();
 ZapString getArg(isize index);
+
+// dtb - dynamic text buffer
+bool dtbInit(isize initialCap);
+bool dtbPushString(ZapString s);
+bool dtbPushChar(char c);
+ZapString dtbGetString();
+void dtbClear();
+void dtbFree();
