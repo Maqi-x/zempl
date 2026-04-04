@@ -27,7 +27,7 @@ enum UndefinedVarBehavior {
     Ignore,
     Warn,
     Error,
-    Empty,
+    Empty
 }
 
 global var input: String;
