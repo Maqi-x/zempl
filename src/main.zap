@@ -11,6 +11,7 @@ ext fun streql(a: String, b: String) Bool;
 
 ext fun readFile(path: String) String;
 ext fun freeFileContent(content: String);
+ext fun writeFile(path: String, content: String) Bool;
 
 ext fun getArgCount() Int;
 ext fun getArg(index: Int) String;
@@ -115,8 +116,12 @@ fun templateEngine(input: String) Bool {
 }
 
 fun saveOutput(file: String) Bool {
-    // TODO
-    println(dtbGetString());
+    var content: String = dtbGetString();
+    if streql(file, "-") || slen(file) == 0 {
+        print(content);
+        return true;
+    }
+    return writeFile(file, content);
 }
 
 fun run() Int {
