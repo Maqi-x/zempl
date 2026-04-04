@@ -78,8 +78,14 @@ fun templateEngine(input: String) Bool {
         var c: Char = sindex(input, i);
         if state == TeState.Text {
             if c == '@' {
-                state = TeState.Var;
-                varStart = i + 1;
+                // @@ -> @
+                if i + 1 < len && sindex(input, i + 1) == '@' {
+                    dtbPushChar('@');
+                    i = i + 1;
+                } else {
+                    state = TeState.Var;
+                    varStart = i + 1;
+                }
             } else {
                 dtbPushChar(c);
             }
