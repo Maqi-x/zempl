@@ -93,6 +93,35 @@ ZapString readFile(ZapString path) {
     return (ZapString) { .ptr = buf, .len = (isize)size };
 }
 
+ZapString readFromStdin() {
+    errorFlag = false;
+
+    isize cap = 1024;
+    isize len = 0;
+    char* buf = malloc((size_t)cap);
+    if (!buf) {
+        errorFlag = true;
+        return (ZapString) { 0 };
+    }
+
+    int c;
+    while ((c = getchar()) != EOF) {
+        if (len >= cap) {
+            cap *= 2;
+            char* next = realloc(buf, (size_t)cap);
+            if (!next) {
+                free(buf);
+                errorFlag = true;
+                return (ZapString) { 0 };
+            }
+            buf = next;
+        }
+        buf[len++] = (char)c;
+    }
+
+    return (ZapString) { .ptr = buf, .len = len };
+}
+
 void freeFileContent(ZapString content) {
     free((void*)content.ptr);
 }

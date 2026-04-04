@@ -26,6 +26,7 @@ void setError(bool v);
 bool isError();
 
 ZapString readFile(ZapString path);
+ZapString readFromStdin();
 void freeFileContent(ZapString content);
 bool writeFile(ZapString path, ZapString content);
 
