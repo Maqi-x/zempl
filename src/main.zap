@@ -49,6 +49,25 @@ enum TeState {
     Var
 }
 
+fun handleUndefinedVariable() Bool {
+    var behavior: UndefinedVarBehavior = apGetUndefinedVarBehavior();
+    if behavior == UndefinedVarBehavior.Ignore {
+        dtbPushChar('@');
+        dtbPushString(varName);
+        dtbPushChar('@');
+    } else if behavior == UndefinedVarBehavior.Warn {
+        eprint("warning: undefined variable ");
+        eprintln(varName);
+    } else if behavior == UndefinedVarBehavior.Error {
+        eprint("error: undefined variable ");
+        eprintln(varName);
+        return false;
+    } else if behavior == UndefinedVarBehavior.Empty {
+        // noop
+    }
+    return true;
+}
+
 fun templateEngine(input: String) Bool {
     dtbInit(slen(input));
 
@@ -69,19 +88,9 @@ fun templateEngine(input: String) Bool {
                 var varName: String = sslice(input, varStart, i);
                 var value: String = hmGet(varName);
                 if isError() {
-                    var behavior: UndefinedVarBehavior = apGetUndefinedVarBehavior();
-                    if behavior == UndefinedVarBehavior.Ignore {
-                        dtbPushChar('@');
-                        dtbPushString(varName);
-                        dtbPushChar('@');
-                    } else if behavior == UndefinedVarBehavior.Warn {
-                        eprint("warning: undefined variable ");
-                        eprintln(varName);
-                    } else if behavior == UndefinedVarBehavior.Error {
-                        eprint("error: undefined variable ");
-                        eprintln(varName);
+                    if !handleUndefinedVariable() {
                         return false;
-                    } else if behavior == UndefinedVarBehavior.Empty {}
+                    }
                 } else {
                     dtbPushString(value);
                 }
