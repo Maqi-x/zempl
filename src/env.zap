@@ -65,8 +65,6 @@ fun envLoad(file: String) Bool {
 
         var key: String = sslice(content, keyStart, keyEnd);
         var value: String = sslice(content, valueStart, valueEnd);
-        println(key);
-        println(value);
         if !hmPut(key, value) {
             eprintln("internal error");
             return false;
