@@ -1,15 +1,14 @@
 #include "zpr.h"
 
-long long hashString(ZapString s) {
-    const int p = 31;
-    const int m = 1e9 + 9;
-    long long hash_value = 0;
-    long long p_pow = 1;
-    for (int i = 0; i < s.len; ++i) {
-        hash_value = (hash_value + (s.ptr[i] - 'a' + 1) * p_pow) % m;
-        p_pow = (p_pow * p) % m;
-    }
-    return hash_value;
-}
+ZapUInt64 hashString(ZapString s) {
+    const ZapUInt64 p = 31;
+    const ZapUInt64 m = 1000000009;
+    ZapUInt64 hash = 0;
 
+    for (int i = 0; i < s.len; ++i) {
+        hash = (hash * p + (unsigned char)s.ptr[i]) % m;
+    }
+
+    return hash;
+}
 

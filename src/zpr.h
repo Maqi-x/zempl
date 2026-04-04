@@ -2,6 +2,8 @@
 
 typedef int isize;
 
+typedef unsigned long long ZapUInt64;
+
 typedef struct ZapString {
     const char* ptr;
     isize len;
