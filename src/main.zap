@@ -15,15 +15,26 @@ ext fun freeFileContent(content: String);
 ext fun getArgCount() Int;
 ext fun getArg(index: Int) String;
 
+ext fun isError() Bool;
+ext fun setError(v: Bool);
+
 // HM functions declarations
 ext fun hmInit();
 ext fun hmPut(key: String, value: String) Bool;
 ext fun hmGet(key: String) String;
 
 // AP functions declarations
+ext fun apGetUndefinedVarBehavior() UndefinedVarBehavior;
 ext fun apGetInput() String;
 ext fun apGetOutput() String;
 ext fun apParse() Bool;
+
+enum UndefinedVarBehavior {
+    Ignore,
+    Warn,
+    Error,
+    Empty
+}
 
 // DTB functions declarations
 ext fun dtbInit(initCap: Int) Bool;
@@ -56,7 +67,24 @@ fun templateEngine(input: String) Bool {
         } else if state == TeState.Var {
             if c == '@' {
                 var varName: String = sslice(input, varStart, i);
-                dtbPushString(hmGet(varName));
+                var value: String = hmGet(varName);
+                if isError() {
+                    var behavior: UndefinedVarBehavior = apGetUndefinedVarBehavior();
+                    if behavior == UndefinedVarBehavior.Ignore {
+                        dtbPushChar('@');
+                        dtbPushString(varName);
+                        dtbPushChar('@');
+                    } else if behavior == UndefinedVarBehavior.Warn {
+                        eprint("warning: undefined variable ");
+                        eprintln(varName);
+                    } else if behavior == UndefinedVarBehavior.Error {
+                        eprint("error: undefined variable ");
+                        eprintln(varName);
+                        return false;
+                    } else if behavior == UndefinedVarBehavior.Empty {}
+                } else {
+                    dtbPushString(value);
+                }
                 state = TeState.Text;
             }
         }
