@@ -6,6 +6,9 @@
 ext fun hashString(s: String) UInt64;
 ext fun streql(a: String, b: String) Bool; 
 
+ext fun isError() Bool;
+ext fun setError(v: Bool);
+
 const CAPACITY: Int = 256;
 
 struct Entry {
@@ -54,6 +57,7 @@ fun hmPut(key: String, value: String) Bool {
 }
 
 fun hmGet(key: String) String {
+    setError(false);
     var idx: UInt64 = hashString(key) % CAPACITY;
 
     var i: Int = 0;
@@ -65,6 +69,7 @@ fun hmGet(key: String) String {
 
         var isUsed: Bool = hmData[probe].used;
         if !isUsed {
+            setError(true);
             return "";
         }
         if streql(hmData[probe].key, key) {
@@ -74,5 +79,6 @@ fun hmGet(key: String) String {
         i = i + 1;
     }
 
+    setError(true);
     return "";
 }

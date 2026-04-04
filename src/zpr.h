@@ -22,6 +22,7 @@ void eprintln(ZapString s);
 
 void printInt(int n);
 
+void setError(bool v);
 bool isError();
 
 ZapString readFile(ZapString path);

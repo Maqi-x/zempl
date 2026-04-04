@@ -11,6 +11,9 @@ bool errorFlag;
 bool isError() {
     return errorFlag;
 }
+void setError(bool v) {
+    errorFlag = v;
+}
 
 isize slen(ZapString s) {
     return s.len;
