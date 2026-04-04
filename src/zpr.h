@@ -27,6 +27,7 @@ bool isError();
 
 ZapString readFile(ZapString path);
 void freeFileContent(ZapString content);
+bool writeFile(ZapString path, ZapString content);
 
 isize getArgCount();
 ZapString getArg(isize index);

@@ -97,6 +97,35 @@ void freeFileContent(ZapString content) {
     free((void*)content.ptr);
 }
 
+bool writeFile(ZapString path, ZapString content) {
+    errorFlag = false;
+
+    char* cpath = malloc(path.len + 1);
+    if (!cpath) {
+        errorFlag = true;
+        return false;
+    }
+    memcpy(cpath, path.ptr, (size_t)path.len);
+    cpath[path.len] = '\0';
+
+    FILE* f = fopen(cpath, "wb");
+    free(cpath);
+    if (!f) {
+        errorFlag = true;
+        return false;
+    }
+
+    size_t written = fwrite(content.ptr, 1, (size_t)content.len, f);
+    fclose(f);
+
+    if (written != (size_t)content.len) {
+        errorFlag = true;
+        return false;
+    }
+
+    return true;
+}
+
 void printInt(int n) {
     printf("%d\n", n);
 }
