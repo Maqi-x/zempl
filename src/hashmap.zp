@@ -19,7 +19,7 @@ struct Entry {
 
 global var hmData: [256]Entry;
 
-fun hmInit() {
+pub fun hmInit() {
     var i: Int = 0;
     while i < CAPACITY {
         hmData[i].used = false;
@@ -27,7 +27,7 @@ fun hmInit() {
     }
 }
 
-fun hmPut(key: String, value: String) Bool {
+pub fun hmPut(key: String, value: String) Bool {
     var idx: UInt64 = hashString(key) % CAPACITY;
 
     var i: Int = 0;
@@ -56,7 +56,7 @@ fun hmPut(key: String, value: String) Bool {
     return false; // table full
 }
 
-fun hmGet(key: String) String {
+pub fun hmGet(key: String) String {
     setError(false);
     var idx: UInt64 = hashString(key) % CAPACITY;
 

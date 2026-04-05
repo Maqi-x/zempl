@@ -43,15 +43,6 @@ void eprint(ZapString s) {
     fwrite(s.ptr, s.len, 1, stderr);
 }
 
-void println(ZapString s) {
-    print(s);
-    putc('\n', stdout);
-}
-void eprintln(ZapString s) {
-    eprint(s);
-    putc('\n', stderr);
-}
-
 ZapString readFile(ZapString path) {
     errorFlag = false;
 
@@ -155,10 +146,6 @@ bool writeFile(ZapString path, ZapString content) {
     return true;
 }
 
-void printInt(int n) {
-    printf("%d\n", n);
-}
-
 typedef struct ZprArgs {
     int count;
     const char* const* arr;
@@ -178,8 +165,8 @@ ZapString getArg(isize index) {
     };
 }
 
-extern int run();
+extern int zap$src$mai$run();
 int main(int argc, const char* const* argv) {
     _args = (ZprArgs) { .count = argc, .arr = argv };
-    return run();
+    return zap$src$mai$run();
 }

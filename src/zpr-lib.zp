@@ -1,0 +1,21 @@
+// ZPR (Zap Portable Runtime) functions declarations
+pub ext fun println(s: String);
+pub ext fun print(s: String);
+pub ext fun eprintln(s: String);
+pub ext fun eprint(s: String);
+ 
+pub ext fun slen(s: String) Int;
+pub ext fun sindex(s: String, idx: Int) Char;
+pub ext fun sslice(s: String, start: Int, end: Int) String;
+pub ext fun streql(a: String, b: String) Bool;
+ 
+pub ext fun readFile(path: String) String;
+pub ext fun readFromStdin() String;
+pub ext fun freeFileContent(content: String);
+pub ext fun writeFile(path: String, content: String) Bool;
+ 
+pub ext fun getArgCount() Int;
+pub ext fun getArg(index: Int) String;
+ 
+pub ext fun isError() Bool;
+pub ext fun setError(v: Bool);

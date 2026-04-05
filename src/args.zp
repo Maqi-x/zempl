@@ -9,21 +9,11 @@ ext fun streql(a: String, b: String) Bool;
 ext fun getArgCount() Int;
 ext fun getArg(index: Int) String;
 
-// HM functions declarations
-ext fun hmInit();
-ext fun hmPut(key: String, value: String) Bool;
-ext fun hmGet(key: String) String;
-
-// ENV functions declarations
-ext fun envLoad(file: String) Bool;
-
-/// AP functions declarations
-/// ext fun apGetInput() String;
-/// ext fun apGetOutput() String;
-/// ext fun apParse() Bool;
+import "hashmap" { hmInit, hmPut, hmGet };
+import "env" { envLoad };
 
 // argument parser implementation
-enum UndefinedVarBehavior {
+pub enum UndefinedVarBehavior {
     Ignore,
     Warn,
     Error,
@@ -36,17 +26,17 @@ global var outputSpecified: Bool;
 
 global var undefVarBehavior: UndefinedVarBehavior;
 
-fun apGetInput() String {
+pub fun apGetInput() String {
     return input;
 }
-fun apGetOutput() String {
+pub fun apGetOutput() String {
     return output;
 }
-fun apGetUndefinedVarBehavior() UndefinedVarBehavior {
+pub fun apGetUndefinedVarBehavior() UndefinedVarBehavior {
     return undefVarBehavior;
 }
 
-fun apParseUndefVarBehavior(s: String) Bool {
+pub fun apParseUndefVarBehavior(s: String) Bool {
     if streql(s, "ignore") {
         undefVarBehavior = UndefinedVarBehavior.Ignore;
         return true;
@@ -63,14 +53,14 @@ fun apParseUndefVarBehavior(s: String) Bool {
     return false;
 }
 
-fun apApplyDefaults() {
+pub fun apApplyDefaults() {
     input = "";
     output = "-";
     outputSpecified = false;
     undefVarBehavior = UndefinedVarBehavior.Warn;
 }
 
-fun apParse() Bool {
+pub fun apParse() Bool {
     apApplyDefaults();
     var i: Int = 1;
     while i < getArgCount() {

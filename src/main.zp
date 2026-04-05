@@ -1,42 +1,17 @@
-// ZPR (Zap Portable Runtime) functions declarations
-//ext fun println(s: String);
-ext fun print(s: String);
-ext fun eprintln(s: String);
-ext fun eprint(s: String);
+import "zpr-lib" { 
+    println, eprint, print, eprintln, writeFile,
+    readFile, readFromStdin, freeFileContent,
+    slen, sindex, sslice, streql,
+    isError, setError
+};
 
-ext fun slen(s: String) Int;
-ext fun sindex(s: String, idx: Int) Char;
-ext fun sslice(s: String, start: Int, end: Int) String;
-ext fun streql(a: String, b: String) Bool;
+import "hashmap" { hmInit, hmPut, hmGet };
 
-ext fun readFile(path: String) String;
-ext fun readFromStdin() String;
-ext fun freeFileContent(content: String);
-ext fun writeFile(path: String, content: String) Bool;
-
-ext fun getArgCount() Int;
-ext fun getArg(index: Int) String;
-
-ext fun isError() Bool;
-ext fun setError(v: Bool);
-
-// HM functions declarations
-ext fun hmInit();
-ext fun hmPut(key: String, value: String) Bool;
-ext fun hmGet(key: String) String;
-
-// AP functions declarations
-ext fun apGetUndefinedVarBehavior() UndefinedVarBehavior;
-ext fun apGetInput() String;
-ext fun apGetOutput() String;
-ext fun apParse() Bool;
-
-enum UndefinedVarBehavior {
-    Ignore,
-    Warn,
-    Error,
-    Empty
-}
+import "args" {
+    apGetUndefinedVarBehavior,
+    UndefinedVarBehavior,
+    apGetInput, apGetOutput, apParse
+};
 
 // DTB functions declarations
 ext fun dtbInit(initCap: Int) Bool;
