@@ -1,0 +1,13 @@
+ext fun dtbInit(initCap: Int) Bool;
+ext fun dtbPushString(s: String) Bool;
+ext fun dtbPushChar(c: Char) Bool;
+ext fun dtbGetString() String;
+ext fun dtbClear();
+ext fun dtbFree();
+
+pub fun init(initCap: Int) Bool { return dtbInit(initCap); }
+pub fun pushString(s: String) Bool { return dtbPushString(s); }
+pub fun pushChar(c: Char) Bool { return dtbPushChar(c); }
+pub fun getString() String { return dtbGetString(); }
+pub fun clear() { dtbClear(); }
+pub fun free() { dtbFree(); }

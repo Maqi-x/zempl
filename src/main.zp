@@ -7,14 +7,7 @@ import "zpr-lib" {
 
 import "hashmap" as hm;
 import "args";
-
-// DTB functions declarations
-ext fun dtbInit(initCap: Int) Bool;
-ext fun dtbPushString(s: String) Bool;
-ext fun dtbPushChar(c: Char) Bool;
-ext fun dtbGetString() String;
-ext fun dtbClear();
-ext fun dtbFree();
+import "dtb";
 
 enum TeState {
     Text,
@@ -24,9 +17,9 @@ enum TeState {
 fun handleUndefinedVariable(varName: String) Bool {
     var behavior: args.UndefinedVarBehavior = args.getUndefinedVarBehavior();
     if behavior == args.UndefinedVarBehavior.Ignore {
-        dtbPushChar('@');
-        dtbPushString(varName);
-        dtbPushChar('@');
+        dtb.pushChar('@');
+        dtb.pushString(varName);
+        dtb.pushChar('@');
     } else if behavior == args.UndefinedVarBehavior.Warn {
         eprint("warning: undefined variable ");
         eprintln(varName);
@@ -41,7 +34,7 @@ fun handleUndefinedVariable(varName: String) Bool {
 }
 
 fun templateEngine(input: String) Bool {
-    dtbInit(slen(input));
+    dtb.init(slen(input));
 
     var state: TeState = TeState.Text;
     var i: Int = 0;
@@ -52,14 +45,14 @@ fun templateEngine(input: String) Bool {
             if c == '@' {
                 // @@ -> @
                 if i + 1 < slen(input) && sindex(input, i + 1) == '@' {
-                    dtbPushChar('@');
+                    dtb.pushChar('@');
                     i = i + 1;
                 } else {
                     state = TeState.Var;
                     varStart = i + 1;
                 }
             } else {
-                dtbPushChar(c);
+                dtb.pushChar(c);
             }
         } else if state == TeState.Var {
             if c == '@' {
@@ -70,7 +63,7 @@ fun templateEngine(input: String) Bool {
                         return false;
                     }
                 } else {
-                    dtbPushString(value);
+                    dtb.pushString(value);
                 }
                 state = TeState.Text;
             }
@@ -79,8 +72,8 @@ fun templateEngine(input: String) Bool {
     }
 
     if state == TeState.Var {
-        dtbPushChar('@');
-        dtbPushString(sslice(input, varStart, slen(input)));
+        dtb.pushChar('@');
+        dtb.pushString(sslice(input, varStart, slen(input)));
     }
 
     return true;
@@ -102,7 +95,7 @@ fun readInput(file: String) String {
 }
 
 fun saveOutput(file: String) Bool {
-    var content: String = dtbGetString();
+    var content: String = dtb.getString();
     if streql(file, "-") || slen(file) == 0 {
         print(content);
         return true;
@@ -128,6 +121,7 @@ fun run() Int {
     freeFileContent(inputContent);
 
     saveOutput(outputFile);
+    dtb.free();
 
     return 0;
 }
