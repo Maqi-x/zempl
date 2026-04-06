@@ -43,7 +43,7 @@ void eprint(ZapString s) {
     fwrite(s.ptr, s.len, 1, stderr);
 }
 
-ZapString readFile(ZapString path) {
+ZapString zprReadFile(ZapString path) {
     errorFlag = false;
 
     char* cpath = malloc(path.len + 1);
@@ -84,7 +84,7 @@ ZapString readFile(ZapString path) {
     return (ZapString) { .ptr = buf, .len = (isize)size };
 }
 
-ZapString readFromStdin() {
+ZapString zprReadFromStdin() {
     errorFlag = false;
 
     isize cap = 1024;
@@ -113,11 +113,11 @@ ZapString readFromStdin() {
     return (ZapString) { .ptr = buf, .len = len };
 }
 
-void freeFileContent(ZapString content) {
+void zprFreeFileContent(ZapString content) {
     free((void*)content.ptr);
 }
 
-bool writeFile(ZapString path, ZapString content) {
+bool zprWriteFile(ZapString path, ZapString content) {
     errorFlag = false;
 
     char* cpath = malloc(path.len + 1);

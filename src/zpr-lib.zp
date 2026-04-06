@@ -8,12 +8,17 @@ pub ext fun slen(s: String) Int;
 pub ext fun sindex(s: String, idx: Int) Char;
 pub ext fun sslice(s: String, start: Int, end: Int) String;
 pub ext fun streql(a: String, b: String) Bool;
- 
-pub ext fun readFile(path: String) String;
-pub ext fun readFromStdin() String;
-pub ext fun freeFileContent(content: String);
-pub ext fun writeFile(path: String, content: String) Bool;
- 
+
+pub ext fun zprReadFile(path: String) String;
+pub ext fun zprReadFromStdin() String;
+pub ext fun zprFreeFileContent(content: String);
+pub ext fun zprWriteFile(path: String, content: String) Bool;
+
+pub fun readFile(path: String) String { return zprReadFile(path); }
+pub fun readFromStdin() String { return zprReadFromStdin(); }
+pub fun freeFileContent(content: String) { zprFreeFileContent(content); }
+pub fun writeFile(path: String, content: String) Bool { return zprWriteFile(path, content); }
+
 pub ext fun getArgCount() Int;
 pub ext fun getArg(index: Int) String;
  

@@ -20,10 +20,10 @@ void eprint(ZapString s);
 void setError(bool v);
 bool isError();
 
-ZapString readFile(ZapString path);
-ZapString readFromStdin();
-void freeFileContent(ZapString content);
-bool writeFile(ZapString path, ZapString content);
+ZapString zprReadFile(ZapString path);
+ZapString zprReadFromStdin();
+void zprFreeFileContent(ZapString content);
+bool zprWriteFile(ZapString path, ZapString content);
 
 isize getArgCount();
 ZapString getArg(isize index);
