@@ -9,7 +9,7 @@ ext fun streql(a: String, b: String) Bool;
 ext fun getArgCount() Int;
 ext fun getArg(index: Int) String;
 
-import "hashmap" { hmInit, hmPut, hmGet };
+import "hashmap" as hm;
 import "env" { envLoad };
 
 // argument parser implementation
@@ -76,7 +76,7 @@ pub fun apParse() Bool {
             i = i + 1;
             var value: String = getArg(i);
 
-            if (!hmPut(key, value)) {
+            if (!hm.put(key, value)) {
                 eprintln("Internal error");
                 return false;
             }

@@ -5,7 +5,7 @@ import "zpr-lib" {
     isError, setError
 };
 
-import "hashmap" { hmInit, hmPut, hmGet };
+import "hashmap" as hm;
 
 import "args" {
     apGetUndefinedVarBehavior,
@@ -69,7 +69,7 @@ fun templateEngine(input: String) Bool {
         } else if state == TeState.Var {
             if c == '@' {
                 var varName: String = sslice(input, varStart, i);
-                var value: String = hmGet(varName);
+                var value: String = hm.get(varName);
                 if isError() {
                     if !handleUndefinedVariable(varName) {
                         return false;
@@ -116,7 +116,7 @@ fun saveOutput(file: String) Bool {
 }
 
 fun run() Int {
-    hmInit();
+    hm.init();
     if !apParse() {
         return 1;
     }
