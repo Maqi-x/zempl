@@ -26,17 +26,17 @@ global var outputSpecified: Bool;
 
 global var undefVarBehavior: UndefinedVarBehavior;
 
-pub fun apGetInput() String {
+pub fun getInput() String {
     return input;
 }
-pub fun apGetOutput() String {
+pub fun getOutput() String {
     return output;
 }
-pub fun apGetUndefinedVarBehavior() UndefinedVarBehavior {
+pub fun getUndefinedVarBehavior() UndefinedVarBehavior {
     return undefVarBehavior;
 }
 
-pub fun apParseUndefVarBehavior(s: String) Bool {
+pub fun parseUndefVarBehavior(s: String) Bool {
     if streql(s, "ignore") {
         undefVarBehavior = UndefinedVarBehavior.Ignore;
         return true;
@@ -53,15 +53,15 @@ pub fun apParseUndefVarBehavior(s: String) Bool {
     return false;
 }
 
-pub fun apApplyDefaults() {
+pub fun applyDefaults() {
     input = "";
     output = "-";
     outputSpecified = false;
     undefVarBehavior = UndefinedVarBehavior.Warn;
 }
 
-pub fun apParse() Bool {
-    apApplyDefaults();
+pub fun parse() Bool {
+    applyDefaults();
     var i: Int = 1;
     while i < getArgCount() {
         var arg: String = getArg(i);
@@ -100,7 +100,7 @@ pub fun apParse() Bool {
                 return false;
             }
             var value: String = getArg(i);
-            if !apParseUndefVarBehavior(value) {
+            if !parseUndefVarBehavior(value) {
                 eprint("Invalid value for --on-undef-var: ");
                 eprintln(value);
                 return false;

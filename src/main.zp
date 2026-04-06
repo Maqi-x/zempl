@@ -6,12 +6,7 @@ import "zpr-lib" {
 };
 
 import "hashmap" as hm;
-
-import "args" {
-    apGetUndefinedVarBehavior,
-    UndefinedVarBehavior,
-    apGetInput, apGetOutput, apParse
-};
+import "args";
 
 // DTB functions declarations
 ext fun dtbInit(initCap: Int) Bool;
@@ -27,19 +22,19 @@ enum TeState {
 }
 
 fun handleUndefinedVariable(varName: String) Bool {
-    var behavior: UndefinedVarBehavior = apGetUndefinedVarBehavior();
-    if behavior == UndefinedVarBehavior.Ignore {
+    var behavior: args.UndefinedVarBehavior = args.getUndefinedVarBehavior();
+    if behavior == args.UndefinedVarBehavior.Ignore {
         dtbPushChar('@');
         dtbPushString(varName);
         dtbPushChar('@');
-    } else if behavior == UndefinedVarBehavior.Warn {
+    } else if behavior == args.UndefinedVarBehavior.Warn {
         eprint("warning: undefined variable ");
         eprintln(varName);
-    } else if behavior == UndefinedVarBehavior.Error {
+    } else if behavior == args.UndefinedVarBehavior.Error {
         eprint("error: undefined variable ");
         eprintln(varName);
         return false;
-    } else if behavior == UndefinedVarBehavior.Empty {
+    } else if behavior == args.UndefinedVarBehavior.Empty {
         // noop
     }
     return true;
@@ -117,12 +112,12 @@ fun saveOutput(file: String) Bool {
 
 fun run() Int {
     hm.init();
-    if !apParse() {
+    if !args.parse() {
         return 1;
     }
 
-    var inputFile: String = apGetInput();
-    var outputFile: String = apGetOutput();
+    var inputFile: String = args.getInput();
+    var outputFile: String = args.getOutput();
 
     var inputContent: String = readInput(inputFile);
     if isError() {
