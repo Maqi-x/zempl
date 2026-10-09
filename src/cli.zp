@@ -1,0 +1,118 @@
+import "std/string";
+import "std/process";
+
+import "std/io" {
+  eprint, eprintln
+};
+import "std/collection" {
+  HashMap
+};
+
+import "env";
+
+pub enum UndefVarBehavior {
+  Ignore,
+  Warn,
+  Error,
+  Empty,
+}
+
+pub struct Args {
+  input: String;
+  output: String;
+  outputSpecified: Bool;
+  undefVarBehavior: UndefVarBehavior;
+}
+
+@error
+struct Error {
+  // TODO: this should actually store info about the error.
+  //       for now the parse function just prints all errors to stderr.
+}
+
+pub fun parseUndefVarBehavior(ref args: Args, s: String) Void!Error {
+  if s == "ignore" {
+    args.undefVarBehavior = UndefVarBehavior.Ignore;
+    return;
+  } else if s == "warn" {
+    args.undefVarBehavior = UndefVarBehavior.Warn;
+    return;
+  } else if s == "error" {
+    args.undefVarBehavior = UndefVarBehavior.Error;
+    return;
+  } else if s == "empty" {
+    args.undefVarBehavior = UndefVarBehavior.Empty;
+    return;
+  }
+  fail Error{};
+  return; // needed because cfg for fail is broken in the compiler
+}
+
+pub fun applyDefaults(ref args: Args) {
+  args.input = "";
+  args.output = "-";
+  args.outputSpecified = false;
+  args.undefVarBehavior = UndefVarBehavior.Warn;
+}
+
+pub fun parse(ref map: HashMap<String>) Args!Error {
+  var args: Args;
+  applyDefaults(ref args);
+
+  var i = 1;
+  while i < process.argc() {
+    var arg = process.argv(i);
+    if arg == "-D" {
+      if !(i+2 < process.argc()) {
+        eprintln("Invalid usage of -D");
+        fail Error{};
+      }
+
+      i += 1;
+      var key = process.argv(i);
+      i += 1;
+      var value = process.argv(i);
+
+      map.put(key, value);
+    } else if arg == "--env" || arg == "-E" {
+      i += 1;
+      if i >= process.argc() {
+        eprintln("Missing filepath for --env");
+        fail Error{};
+      }
+
+      var filepath = process.argv(i);
+
+      if !env.load(filepath, ref map) {
+        eprint("Failed to load env file: ");
+        eprintln(filepath);
+        fail Error{};
+      }
+    } else if arg == "--on-undef-var" || arg == "-U" {
+      i += 1;
+      if i >= process.argc() {
+        eprintln("Missing value for --on-undef-var");
+        fail Error{};
+      }
+
+      var value = process.argv(i);
+      parseUndefVarBehavior(ref args, value) or err {
+        eprint("Invalid value for --on-undef-var: ");
+        eprintln(value);
+        fail Error{};
+      };
+    } else if string.len(args.input) == 0 {
+      args.input = arg;
+    } else if string.len(args.output) == 0 || !args.outputSpecified {
+      args.output = arg;
+    } else {
+      eprint("Unexpected argument: ");
+      eprintln(arg);
+      fail Error{};
+    }
+
+    i += 1;
+  }
+
+  return args;
+}

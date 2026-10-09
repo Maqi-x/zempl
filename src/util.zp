@@ -1,0 +1,20 @@
+import "std/c";
+
+ext fun getchar() c.int;
+const EOF: c.int = -1;
+
+pub fun readFromStdin() String {
+  var result: String;
+
+  while true {
+    var c = getchar();
+    if c == EOF {
+      break;
+    }
+
+    var char = c as Char;
+    result += char;
+  }
+
+  return result;
+}

@@ -1,127 +1,113 @@
-import "zpr-lib" { 
-    println, eprint, print, eprintln, writeFile,
-    readFile, readFromStdin, freeFileContent,
-    slen, sindex, sslice, streql,
-    isError, setError
-};
+import "cli";
+import "util";
 
-import "hashmap" as hm;
-import "args";
-import "dtb";
+import "std/fs";
+import "std/io" { eprint, eprintln };
+
+import "std/string" { TextBuf };
+import "std/collection" { HashMap };
 
 enum TeState {
-    Text,
-    Var
+  Text,
+  Var,
 }
 
-fun handleUndefinedVariable(varName: String) Bool {
-    var behavior: args.UndefinedVarBehavior = args.getUndefinedVarBehavior();
-    if behavior == args.UndefinedVarBehavior.Ignore {
-        dtb.pushChar('@');
-        dtb.pushString(varName);
-        dtb.pushChar('@');
-    } else if behavior == args.UndefinedVarBehavior.Warn {
-        eprint("warning: undefined variable ");
-        eprintln(varName);
-    } else if behavior == args.UndefinedVarBehavior.Error {
-        eprint("error: undefined variable ");
-        eprintln(varName);
-        return false;
-    } else if behavior == args.UndefinedVarBehavior.Empty {
-        // noop
-    }
-    return true;
+global var buf: TextBuf;
+global var map: HashMap<String>;
+
+fun handleUndefinedVariable(ref args: cli.Args, varName: String) Bool {
+  var behavior = args.undefVarBehavior;
+  if behavior == cli.UndefVarBehavior.Ignore {
+    buf.pushChar('@');
+    buf.push(varName);
+    buf.pushChar('@');
+  } else if behavior == cli.UndefVarBehavior.Warn {
+    eprint("warning: undefined variable ");
+    eprintln(varName);
+  } else if behavior == cli.UndefVarBehavior.Error {
+    eprint("error: undefined variable ");
+    eprintln(varName);
+    return false;
+  } else if behavior == cli.UndefVarBehavior.Empty {
+    // noop
+  }
+  return true;
 }
 
-fun templateEngine(input: String) Bool {
-    dtb.init(slen(input));
-
-    var state: TeState = TeState.Text;
-    var i: Int = 0;
-    var varStart: Int = 0;
-    while i < slen(input) {
-        var c: Char = sindex(input, i);
-        if state == TeState.Text {
-            if c == '@' {
-                // @@ -> @
-                if i + 1 < slen(input) && sindex(input, i + 1) == '@' {
-                    dtb.pushChar('@');
-                    i = i + 1;
-                } else {
-                    state = TeState.Var;
-                    varStart = i + 1;
-                }
-            } else {
-                dtb.pushChar(c);
-            }
-        } else if state == TeState.Var {
-            if c == '@' {
-                var varName: String = sslice(input, varStart, i);
-                var value: String = hm.get(varName);
-                if isError() {
-                    if !handleUndefinedVariable(varName) {
-                        return false;
-                    }
-                } else {
-                    dtb.pushString(value);
-                }
-                state = TeState.Text;
-            }
+fun substitute(input: String) Bool {
+  var state: TeState = TeState.Text;
+  var i: Int = 0;
+  var varStart: Int = 0;
+  while i < string.len(input) {
+    var c = input[i];
+    if state == TeState.Text {
+      if c == '@' {
+        // @@ -> @
+        if i + 1 < string.len(input) && input[i + 1] == '@' {
+          buf.pushChar('@');
+          i = i + 1;
+        } else {
+          state = TeState.Var;
+          varStart = i + 1;
         }
-        i = i + 1;
+      } else {
+        buf.pushChar(c);
+      }
+    } else if state == TeState.Var {
+      if c == '@' {
+        var varName: String = string.slice(input, varStart, i);
+        var value: String = map.get(varName);
+        buf.push(value);
+        state = TeState.Text;
+      }
     }
+    i++;
+  }
 
-    if state == TeState.Var {
-        dtb.pushChar('@');
-        dtb.pushString(sslice(input, varStart, slen(input)));
-    }
+  if state == TeState.Var {
+    buf.pushChar('@');
+    buf.push(string.slice(input, varStart, string.len(input)));
+  }
 
-    return true;
+  return true;
 }
 
 fun readInput(file: String) String {
-    var result: String;
-    if streql(file, "-") || slen(file) == 0 {
-        result = readFromStdin();
-    } else {
-        result = readFile(file);
-    }
+  var result: String;
+  if file == "-" || string.len(file) == 0 {
+    result = util.readFromStdin();
+  } else {
+    result = fs.readFile(file) or err {
+      eprint("failed to read input from ");
+      eprintln(file);
+      return "";
+    };
+  }
 
-    if isError() {
-        eprint("failed to read input from ");
-        eprintln(file);
-    }
-    return result;
+  return result;
 }
 
 fun saveOutput(file: String) Bool {
-    var content: String = dtb.getString();
-    if streql(file, "-") || slen(file) == 0 {
-        print(content);
-        return true;
-    }
-    return writeFile(file, content);
+  var content: String = buf.build();
+  if file == "-" || string.len(file) == 0 {
+    print(content);
+    return true;
+  }
+
+  fs.writeFile(file, content) or err {
+    return false;
+  };
+  return true;
 }
 
-fun run() Int {
-    hm.init();
-    if !args.parse() {
-        return 1;
-    }
+fun main() Int {
+  var args = cli.parse(ref map) or err {
+    return 1;
+  };
 
-    var inputFile: String = args.getInput();
-    var outputFile: String = args.getOutput();
+  var input: String = readInput(args.input);
+  substitute(input);
 
-    var inputContent: String = readInput(inputFile);
-    if isError() {
-        return 2;
-    }
-
-    templateEngine(inputContent);
-    freeFileContent(inputContent);
-
-    saveOutput(outputFile);
-    dtb.free();
-
-    return 0;
+  saveOutput(args.output);
+  return 0;
 }
