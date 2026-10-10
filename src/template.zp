@@ -54,14 +54,14 @@ pub fun substitute(input: String, ref map: HashMap<String>, uvb: UndefVarBehavio
       }
     } else if state == State.Var {
       if c == '@' {
-        var varName: String = string.slice(input, varStart, i);
+        var varName: String = string.slice(input, varStart, i - varStart);
         if !map.contains(varName) {
           handleUndefVar(uvb, varName, ref buf)?;
         } else {
           var value: String = map.get(varName);
           buf.push(value);
-          state = State.Text;
         }
+        state = State.Text;
       }
     }
     i++;
