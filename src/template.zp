@@ -1,0 +1,77 @@
+import "cli" { UndefVarBehavior };
+import "std/string" { TextBuf };
+import "std/io" { eprint, eprintln };
+
+enum State {
+  Text,
+  Var,
+}
+
+@error
+enum Error {
+  UndefVar,
+}
+
+fun handleUndefVar(behavior: UndefVarBehavior, varName: String, ref buf: TextBuf) Void!Error {
+  if behavior == UndefVarBehavior.Ignore {
+    buf.pushChar('@');
+    buf.push(varName);
+    buf.pushChar('@');
+  } else if behavior == UndefVarBehavior.Warn {
+    eprint("warning: undefined variable ");
+    eprintln(varName);
+  } else if behavior == UndefVarBehavior.Error {
+    eprint("error: undefined variable ");
+    eprintln(varName);
+    fail Error.UndefVar;
+  } else if behavior == UndefVarBehavior.Empty {
+    // noop
+  }
+  return;
+}
+
+pub fun substitute(input: String, ref map: HashMap<String>, uvb: UndefVarBehavior) String!Error {
+  var state: State = State.Text;
+  var buf: TextBuf = new TextBuf();
+
+  var i: Int = 0;
+  var varStart: Int = 0;
+
+  while i < string.len(input) {
+    var c = input[i];
+    if state == State.Text {
+      if c == '@' {
+        // @@ -> @
+        if i + 1 < string.len(input) && input[i + 1] == '@' {
+          buf.pushChar('@');
+          i = i + 1;
+        } else {
+          state = State.Var;
+          varStart = i + 1;
+        }
+      } else {
+        buf.pushChar(c);
+      }
+    } else if state == State.Var {
+      if c == '@' {
+        var varName: String = string.slice(input, varStart, i);
+        if !map.contains(varName) {
+          handleUndefVar(uvb, varName, ref buf)?;
+        } else {
+          var value: String = map.get(varName);
+          buf.push(value);
+          state = State.Text;
+        }
+      }
+    }
+    i++;
+  }
+
+  if state == State.Var {
+    buf.pushChar('@');
+    buf.push(string.slice(input, varStart, string.len(input)));
+  }
+
+  return buf.build();
+}
+

@@ -2,75 +2,12 @@ import "cli";
 import "util";
 
 import "std/fs";
-import "std/io" { eprint, eprintln };
+import "std/string";
 
-import "std/string" { TextBuf };
+import "std/io" { eprint, eprintln };
 import "std/collection" { HashMap };
 
-enum TeState {
-  Text,
-  Var,
-}
-
-global var buf: TextBuf;
-global var map: HashMap<String>;
-
-fun handleUndefinedVariable(ref args: cli.Args, varName: String) Bool {
-  var behavior = args.undefVarBehavior;
-  if behavior == cli.UndefVarBehavior.Ignore {
-    buf.pushChar('@');
-    buf.push(varName);
-    buf.pushChar('@');
-  } else if behavior == cli.UndefVarBehavior.Warn {
-    eprint("warning: undefined variable ");
-    eprintln(varName);
-  } else if behavior == cli.UndefVarBehavior.Error {
-    eprint("error: undefined variable ");
-    eprintln(varName);
-    return false;
-  } else if behavior == cli.UndefVarBehavior.Empty {
-    // noop
-  }
-  return true;
-}
-
-fun substitute(input: String) Bool {
-  var state: TeState = TeState.Text;
-  var i: Int = 0;
-  var varStart: Int = 0;
-  while i < string.len(input) {
-    var c = input[i];
-    if state == TeState.Text {
-      if c == '@' {
-        // @@ -> @
-        if i + 1 < string.len(input) && input[i + 1] == '@' {
-          buf.pushChar('@');
-          i = i + 1;
-        } else {
-          state = TeState.Var;
-          varStart = i + 1;
-        }
-      } else {
-        buf.pushChar(c);
-      }
-    } else if state == TeState.Var {
-      if c == '@' {
-        var varName: String = string.slice(input, varStart, i);
-        var value: String = map.get(varName);
-        buf.push(value);
-        state = TeState.Text;
-      }
-    }
-    i++;
-  }
-
-  if state == TeState.Var {
-    buf.pushChar('@');
-    buf.push(string.slice(input, varStart, string.len(input)));
-  }
-
-  return true;
-}
+import "template" { substitute };
 
 fun readInput(file: String) String {
   var result: String;
@@ -87,8 +24,7 @@ fun readInput(file: String) String {
   return result;
 }
 
-fun saveOutput(file: String) Bool {
-  var content: String = buf.build();
+fun saveOutput(file: String, content: String) Bool {
   if file == "-" || string.len(file) == 0 {
     print(content);
     return true;
@@ -101,13 +37,16 @@ fun saveOutput(file: String) Bool {
 }
 
 fun main() Int {
+  var map = new HashMap<String>();
   var args = cli.parse(ref map) or err {
+    return 2;
+  };
+
+  var input = readInput(args.input);
+  var output = substitute(input, ref map, args.undefVarBehavior) or err {
     return 1;
   };
 
-  var input: String = readInput(args.input);
-  substitute(input);
-
-  saveOutput(args.output);
+  saveOutput(args.output, output);
   return 0;
 }
